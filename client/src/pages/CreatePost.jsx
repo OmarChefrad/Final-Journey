@@ -15,8 +15,29 @@ export const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const generateImage = () => {
-    
+  const generateImage = async () => {
+    if (form.prompt) {
+      try {
+        setGeneratingImg(true)
+        const response = fetch('http://localhost:8080/api/v1/dalle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt: form.prompt }),
+        })
+
+        const data = await response.json()
+
+        setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}`})
+      }catch (error) {
+        alert(error)
+      } finally {
+        setGeneratingImg(false)
+      }
+    } else {
+      alert('Please enter a prompt')
+    }
   }
 
   const handleSumbit = () => {
@@ -54,7 +75,7 @@ export const CreatePost = () => {
           type="text"
           name="name"
           placeholder="We can Make It Happen"
-          value={form.name}
+          value={form.prompt}
           handleChange={handleChange}
           isSupriseMe
           handleSupriseMe={handleSupriseMe}
